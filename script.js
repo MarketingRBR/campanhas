@@ -256,6 +256,7 @@ function renderChartMarcas(rows){
   const pctData = labels.map((l,i)=> metaData[i]>0 ? Math.round((realData[i]/metaData[i])*1000)/10 : null);
 
   charts.marcas = new Chart(document.getElementById('chartMarcas'), {
+    type:'bar',
     data:{
       labels,
       datasets:[
@@ -421,7 +422,7 @@ function renderTable(rows){
   } else {
     dataTable = $('#campaignsTable').DataTable({
       data: body,
-      columns: Array(14).fill({}),
+      columns: Array.from({length:14}, () => ({})),
       pageLength: 10,
       lengthMenu: [10,25,50,100],
       language: {
@@ -565,10 +566,19 @@ document.getElementById('exportPDF').addEventListener('click', () => {
    10. BOOT
    ------------------------------------------------------------------- */
 window.addEventListener('DOMContentLoaded', () => {
-  loadEmbeddedData();
-  populateFilterOptions();
-  setLastUpdate();
-  setupFilterEvents();
-  refreshAll();
-  setTimeout(() => document.getElementById('loader').classList.add('hidden'), 600);
+  try{
+    loadEmbeddedData();
+    populateFilterOptions();
+    setLastUpdate();
+    setupFilterEvents();
+    refreshAll();
+  } catch(err){
+    console.error('Erro ao iniciar o painel RBR:', err);
+    const loaderText = document.querySelector('#loader p');
+    if(loaderText){
+      loaderText.textContent = 'Ocorreu um erro ao carregar o painel. Verifique a console (F12) para detalhes.';
+    }
+  } finally {
+    setTimeout(() => document.getElementById('loader').classList.add('hidden'), 600);
+  }
 });
